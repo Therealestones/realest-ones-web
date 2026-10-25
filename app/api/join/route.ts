@@ -12,6 +12,11 @@ import { NextResponse } from 'next/server';
  *    endpoint. ONE-TIME ACTIVATION REQUIRED: submit the form once, then open
  *    realestones@outlook.com and click the FormSubmit activation link.
  *    Until activated, submissions are held, not delivered.
+ *
+ * Auto-reply: when RESEND_FROM is set (i.e. a domain is verified in Resend),
+ * every signup also gets a "Welcome to First Access." email. Until then the
+ * auto-reply is skipped, because Resend's test sender can only reach the
+ * account owner's own inbox. A failed auto-reply never fails the signup.
  */
 
 const DESTINATION = 'realestones@outlook.com';
@@ -42,6 +47,33 @@ async function sendViaResend(signupEmail: string): Promise<{ ok: boolean; error?
     return { ok: false, error: `Resend rejected the request (${res.status}): ${body.slice(0, 200)}` };
   }
   return { ok: true };
+}
+
+async function sendAutoReply(signupEmail: string): Promise<void> {
+  // Best-effort welcome email to the subscriber. Only runs once a verified
+  // sender is configured: with Resend's test sender, only the account
+  // owner's own inbox is reachable, so a reply to the subscriber would
+  // always be rejected. Never throws, never fails the signup.
+  const from = process.env.RESEND_FROM;
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!from || !apiKey) return;
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from,
+        to: [signupEmail],
+        subject: 'Welcome to First Access.',
+        text: `You're on the list.\n\nYou're in.\n\nFirst Access members get the Drop 002 date before it goes public. No spam. Drops, restocks, and Jacksonville events only.\n\nThe Realest Ones\nNot For Ourselves Alone Are We Born.\nPurpose is the Real Legacy.\n\nThanks for Joining The Family. Talk soon!`,
+      }),
+    });
+  } catch {
+    // Auto-reply is best-effort; the signup itself already succeeded.
+  }
 }
 
 async function sendViaFormSubmit(signupEmail: string): Promise<{ ok: boolean; error?: string }> {
@@ -80,6 +112,7 @@ export async function POST(req: Request) {
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: 502 });
     }
+    await sendAutoReply(email);
     return NextResponse.json({ ok: true, via: 'resend' });
   }
 
