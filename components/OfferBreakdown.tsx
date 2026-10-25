@@ -7,6 +7,20 @@ function ProductImage({ product }: { product: Product }) {
   const [failed, setFailed] = useState(false);
 
   if (failed) {
+    // No photo yet: a coming-soon piece gets a COMING SOON treatment
+    // rather than a blank spot. The photo takes over automatically
+    // once it lands in public/images/.
+    if (product.stockLabel.toLowerCase().includes('coming soon')) {
+      return (
+        <div className="flex aspect-[4/5] flex-col items-center justify-center bg-elevated px-6 text-center">
+          <span className="font-display text-6xl uppercase leading-[0.95] text-bone">
+            Coming
+            <br />
+            Soon
+          </span>
+        </div>
+      );
+    }
     // Branded placeholder — shows until you add the real image to public/images/
     return (
       <div className="flex aspect-[4/5] items-center justify-center bg-elevated">
