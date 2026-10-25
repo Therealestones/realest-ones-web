@@ -11,7 +11,7 @@ export default function Hero() {
       />
       <div className="relative mx-auto max-w-shell px-sm pb-20 pt-24 md:px-md md:pb-24 md:pt-28">
         <p className="mb-6 font-heading text-xs font-semibold uppercase tracking-[0.22em] text-gold">
-          Jacksonville &bull; Est. 2026 &bull; Purpose is the real flex
+          Jacksonville &bull; Est. 2026 &bull; Purpose is the real legacy
         </p>
         <h1 className="mb-7 font-display text-[clamp(3.5rem,12vw,8rem)] uppercase leading-[0.95] tracking-[0.01em]">
           Real
