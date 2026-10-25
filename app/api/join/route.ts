@@ -28,7 +28,9 @@ async function sendViaResend(signupEmail: string): Promise<{ ok: boolean; error?
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: process.env.RESEND_FROM || 'The Realest Ones <noreply@realestones.com>',
+      // Without a verified domain, Resend only allows its test sender.
+      // Set RESEND_FROM only once you have verified a domain in Resend.
+      from: process.env.RESEND_FROM || 'onboarding@resend.dev',
       to: [DESTINATION],
       subject: 'New family signup — The Realest Ones',
       text: `New "Join the Family" signup from therealestones.com\n\nEmail: ${signupEmail}\nTime: ${new Date().toISOString()}`,
