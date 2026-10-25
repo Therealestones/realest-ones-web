@@ -33,7 +33,7 @@ async function sendViaResend(signupEmail: string): Promise<{ ok: boolean; error?
       from: process.env.RESEND_FROM || 'onboarding@resend.dev',
       to: [DESTINATION],
       subject: 'New family signup — The Realest Ones',
-      text: `New "Join the Family" signup from therealestones.com\n\nEmail: ${signupEmail}\nTime: ${new Date().toISOString()}`,
+      text: `New "Join the Family" signup from The Realest Ones\n\nEmail: ${signupEmail}\nTime: ${new Date().toISOString()}`,
     }),
   });
 
